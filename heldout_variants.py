@@ -1,6 +1,6 @@
 """Fresh, hand-authored demo variants, excluded from RSS selection.
 
-`demo.py` retains its original five selection variants for each setting.
+`demo/demo.py` retains its original five selection variants for each setting.
 This file provides ten different texts for each setting. These are small,
 illustrative public examples, NOT the exact paper's held-out operator draws.
 """
@@ -68,7 +68,7 @@ SETTINGS = (
 def heldout_variants(opening, verb, target, setting):
     """Ten variants for a setting, distinct from the original demo's five.
 
-    The target phrase is preserved verbatim, so demo.sae_features can align the
+    The target phrase is preserved verbatim, so sae_features in demo/demo.py can align the
     final overlapping token. Validity and disjointness are checked by the caller.
     """
     core = f"{opening} {verb} {target}"

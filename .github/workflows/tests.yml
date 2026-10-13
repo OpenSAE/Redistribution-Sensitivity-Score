@@ -17,4 +17,4 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install numpy pytest
       - run: python -m pytest -q
-      - run: python -m py_compile demo.py
+      - run: python -m py_compile demo/demo.py demo/demo_heldout.py demo/demo_readout.py

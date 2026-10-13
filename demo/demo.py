@@ -1,21 +1,26 @@
 """RSS demo: GPT-2 Small + a public SAE, 24 prompts, 6 prompt transformations, 5 variants each.
 
-python demo.py                 # layer 8, about 1 minute on a CPU
-python demo.py --layer 4       # paper layers for GPT-2 Small: 4, 6, 8, 10
+python demo/demo.py                 # layer 8, about 1 minute on a CPU
+python demo/demo.py --layer 4       # paper layers for GPT-2 Small: 4, 6, 8, 10
 
 The five variants in SETTINGS are the selection set for this demo. The other
 scripts keep that split and add the checks that come after selection:
 
-heldout_variants.py    ten further prompts per transformation, written by hand
-demo_heldout.py        select on the five, then score direction on the ten
-rss_validation.py      the same split for SAE activations you already have
-rss_readout.py         erosion, failure, reconstruction and restoration
-demo_readout.py        run that readout on a synthetic example or your .npy arrays
+heldout_variants.py         ten further prompts per transformation, written by hand
+demo/demo_heldout.py        select on the five, then score direction on the ten
+rss_validation.py           the same split for SAE activations you already have
+rss_readout.py              erosion, failure, reconstruction and restoration
+demo/demo_readout.py        run that readout on a synthetic example or your .npy arrays
 
 Pass a probe that is already trained. These scripts evaluate it. The printed
 rates are for this public model and these prompts. The 27-SAE numbers in the
 README are the paper results.
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import argparse
 import itertools
 import warnings

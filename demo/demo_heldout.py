@@ -1,11 +1,16 @@
 """GPT-2 Small + public SAE: select RSS features, then test unseen variants.
 
-  python demo_heldout.py                          # 3 prompts x 2 settings
-  python demo_heldout.py --max-prompts 24 --all-settings
+  python demo/demo_heldout.py                          # 3 prompts x 2 settings
+  python demo/demo_heldout.py --max-prompts 24 --all-settings
 
 Downloads the public GPT-2 and SAE checkpoints on the first run. Not a
 reproduction of the full paper's 27-SAE, 1000-prompt validation experiment.
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import argparse
 
 import numpy as np
@@ -29,7 +34,7 @@ def main():
     import torch
     from sae_lens import SAE
     from transformer_lens import HookedTransformer
-    from demo import PROMPTS, SETTINGS, sae_features
+    from demo.demo import PROMPTS, SETTINGS, sae_features
 
     names = list(SETTINGS) if args.all_settings else args.settings
     if not names or any(n not in SETTINGS for n in names):

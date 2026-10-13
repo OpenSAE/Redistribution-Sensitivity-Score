@@ -257,10 +257,10 @@ print(support, direction, round(mean_rss, 2))
 👉 在 GPT-2 Small 上运行
 
 ```bash
-python demo.py
+python demo/demo.py
 ```
 
-🧰 **用在自己的 SAE 上。** 为每个原始 prompt 写若干变体，保持请求不变，并让目标短语恰好出现一次。在与目标短语重叠的最后一个 token 处读取 SAE，做法同 [`demo.py`](demo.py) 里的 `sae_features`。在查看任何特征之前先把变体分成选择变体和留出变体，在前一组上选择，在后一组上检验选定方向。
+🧰 **用在自己的 SAE 上。** 为每个原始 prompt 写若干变体，保持请求不变，并让目标短语恰好出现一次。在与目标短语重叠的最后一个 token 处读取 SAE，做法同 [`demo/demo.py`](demo/demo.py) 里的 `sae_features`。在查看任何特征之前先把变体分成选择变体和留出变体，在前一组上选择，在后一组上检验选定方向。
 
 ```python
 from rss import rss, held_out_rate
@@ -346,7 +346,7 @@ RSS 重建留出 logit 变化的 $`R^2`$ 约为 0.58 和 0.63。把选中特征�
 
 ## 🧪 Demo
 
-`demo.py` 用 GPT-2 Small 和它的公开 SAE，在我们写的 24 个 prompt 上做 6 种改写，每种 5 个变体。它在每个变体都保留的那部分 prompt 的最后一个 token 处读取 SAE，对每个 prompt 和设置运行 `rss`，报告 MeanRSS、归一化值，以及上下文包装与局部改动之间的差。`python demo.py` 默认用第 8 层，CPU 上约一分钟。用 `--layer` 可以选论文里 GPT-2 的另外三层 4、6、10。
+`demo/demo.py` 用 GPT-2 Small 和它的公开 SAE，在我们写的 24 个 prompt 上做 6 种改写，每种 5 个变体。它在每个变体都保留的那部分 prompt 的最后一个 token 处读取 SAE，对每个 prompt 和设置运行 `rss`，报告 MeanRSS、归一化值，以及上下文包装与局部改动之间的差。`python demo/demo.py` 默认用第 8 层，CPU 上约一分钟。用 `--layer` 可以选论文里 GPT-2 的另外三层 4、6、10。
 
 ```text
 GPT-2 Small, layer 8, 24 prompts
@@ -374,7 +374,7 @@ Prompts where context and wrappers move more: 24 / 24
 **留出验证。** 在 5 个 prompt 变体上选择 RSS 特征，再用 GPT-2 Small 检验其在另外 10 个变体上的方向一致性。
 
 ```bash
-python demo_heldout.py
+python demo/demo_heldout.py
 ```
 
 [`rss_validation.py`](rss_validation.py) 提供评估函数，[`heldout_variants.py`](heldout_variants.py) 提供额外的测试 prompt。
@@ -382,11 +382,11 @@ python demo_heldout.py
 **冻结读出评估。** 使用固定的线性探针评估重复失败预测、logit 重构和读出恢复。
 
 ```bash
-python demo_readout.py --example
-python demo_readout.py --data-dir /path/to/arrays
+python demo/demo_readout.py --example
+python demo/demo_readout.py --data-dir /path/to/arrays
 ```
 
-核心实现位于 [`rss_readout.py`](rss_readout.py)。运行 `python demo_readout.py --example --export-example ./example_data` 可查看所需的 `.npy` 数据格式。
+核心实现位于 [`rss_readout.py`](rss_readout.py)。运行 `python demo/demo_readout.py --example --export-example ./example_data` 可查看所需的 `.npy` 数据格式。
 
 ---
 

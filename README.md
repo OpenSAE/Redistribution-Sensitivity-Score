@@ -304,11 +304,11 @@ every time but flips its direction, so it is dropped.
 👉 On GPT-2 Small
 
 ```bash
-python demo.py
+python demo/demo.py
 ```
 
 🧰 **Your own SAE.** Write variants of each clean prompt that keep the request and contain the target phrase exactly
-once. Read the SAE at the last token that overlaps the target phrase, as `sae_features` in [`demo.py`](demo.py) does.
+once. Read the SAE at the last token that overlaps the target phrase, as `sae_features` in [`demo/demo.py`](demo/demo.py) does.
 Split the variants into selection and held out variants before looking at any feature, select on the first set and check
 the selected directions on the second.
 
@@ -409,10 +409,10 @@ for each case, not a single reduced probe that replaces the full clean computati
 
 ## 🧪 Demo
 
-`demo.py` runs GPT-2 Small with its public SAE on 24 prompts that we wrote, under six transformations with five
+`demo/demo.py` runs GPT-2 Small with its public SAE on 24 prompts that we wrote, under six transformations with five
 variants each. It reads the SAE at the last token of the part of the prompt that every variant keeps, applies `rss`
 to each prompt and setting, and reports MeanRSS, the normalized value and the gap between context and wrapper settings
-and local edits. `python demo.py` uses layer 8 and takes about a minute on a CPU. The option `--layer` selects 4, 6
+and local edits. `python demo/demo.py` uses layer 8 and takes about a minute on a CPU. The option `--layer` selects 4, 6
 or 10, the other GPT-2 layers in the paper.
 
 ```text
@@ -444,7 +444,7 @@ reports gaps of 0.939 to 0.979 for these four layers.
 **Held-out Validation.** Select RSS features from five prompt variants and test their directional consistency on ten unseen variants using GPT-2 Small.
 
 ```bash
-python demo_heldout.py
+python demo/demo_heldout.py
 ```
 
 [`rss_validation.py`](rss_validation.py) provides the evaluation function, and [`heldout_variants.py`](heldout_variants.py) supplies the additional prompts.
@@ -452,11 +452,11 @@ python demo_heldout.py
 **Frozen Readout Evaluation.** Evaluate recurrent failure prediction, logit reconstruction, and readout restoration using a fixed linear probe.
 
 ```bash
-python demo_readout.py --example
-python demo_readout.py --data-dir /path/to/arrays
+python demo/demo_readout.py --example
+python demo/demo_readout.py --data-dir /path/to/arrays
 ```
 
-[`rss_readout.py`](rss_readout.py) implements the evaluation. To inspect the required `.npy` input format, run `python demo_readout.py --example --export-example ./example_data`.
+[`rss_readout.py`](rss_readout.py) implements the evaluation. To inspect the required `.npy` input format, run `python demo/demo_readout.py --example --export-example ./example_data`.
 
 ---
 
