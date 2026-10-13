@@ -1,13 +1,8 @@
-# RSS: Representation Redistribution in Sparse Autoencoders
+# 🔀 Representation Redistribution in Sparse Autoencoders
 
 🌍 Languages: [English](README.md) | [中文](README_cn.md)
 
-👉 TL;DR. Prompt transformations designed to keep the request the same can still redistribute activity across sparse
-autoencoder features. We introduce the redistribution sensitivity score, RSS, which selects large feature responses that
-recur in a consistent direction, and we evaluate the selected features on variants excluded from selection. Across 27
-pretrained SAEs from eight language models, the tested transformations produce a reproducible redistribution profile.
-In two frozen safety readouts, combining RSS support erosion with the clean margin gives recurrent failure AUROCs of
-0.935 and 0.958 with median supports of 20 and 19 features, compared with 0.965 and 0.964 using full erosion.
+👉 TL;DR. Prompt changes can redistribute activity across SAE features, even when the underlying request stays the same. **Redistribution Sensitivity Score (RSS)** identifies features that show strong, consistent shifts across these changes.
 
 <p align="center">
   <b>📄 arXiv paper coming soon</b> &nbsp; | &nbsp;
