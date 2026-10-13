@@ -458,8 +458,6 @@ python demo_readout.py --data-dir /path/to/arrays
 
 [`rss_readout.py`](rss_readout.py) implements the evaluation. To inspect the required `.npy` input format, run `python demo_readout.py --example --export-example ./example_data`.
 
-**Note:** The held-out demo uses a separate set of hand-written variants, and the readout example uses synthetic data. Neither reproduces the paper's full experiments.
-
 ---
 
 ## 🗺️ Figure Map

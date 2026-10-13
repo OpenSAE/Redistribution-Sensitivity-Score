@@ -388,8 +388,6 @@ python demo_readout.py --data-dir /path/to/arrays
 
 核心实现位于 [`rss_readout.py`](rss_readout.py)。运行 `python demo_readout.py --example --export-example ./example_data` 可查看所需的 `.npy` 数据格式。
 
-**注意：** 留出 Demo 使用额外编写的变体，读出示例使用合成数据，均不代表完整复现论文实验。
-
 ---
 
 ## 🗺️ 图表索引
