@@ -270,7 +270,7 @@ support, direction, mean_rss = rss(a_sel - a0)
 rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个值
 ```
 
-`held_out_rate` 就是论文 Equation 20 的留出响应率，也就是 Figure 4A 里的量。两个函数遇到 nan 或 inf、形状不对或参数超出范围时都会报错，不会返回一个看似正常的数字。[`rss_validation.py`](rss_validation.py) 在一组激活上选择，在另一组上计分。[`demo_heldout.py`](demo_heldout.py) 用 [`demo.py`](demo.py) 里的 prompt 跑这个检验。已经训好的探针由 [`rss_readout.py`](rss_readout.py) 和 [`demo_readout.py`](demo_readout.py) 计分。命令和数组格式见 Demo 一节。
+留出验证和冻结读出评估见[更多 Demo](#更多-demo)。
 
 ---
 
@@ -369,47 +369,26 @@ Prompts where context and wrappers move more: 24 / 24
 
 ✅ demo 和论文的规律一致。上下文和包装比局部改动让表示变化更大，同类词替换动到的是另一批特征。第 4、6、8、10 层的差分别为 0.903、0.717、0.492、0.390，24 个 prompt 中有 23 或 24 个方向一致。论文用 1,000 个生成的 prompt，这四层的差为 0.939 到 0.979。
 
-上面的 5 个变体是选择集。下面这些文件用这 5 个变体选特征，再在选择时没有见过的 prompt 和标签上检验。
+### 更多 Demo
 
-[`heldout_variants.py`](heldout_variants.py) 为 6 种改写各写了 10 条新 prompt。目标短语原文保留，并且只出现一次。这是另一批手写样本，和论文里的留出算子采样是不同的样本。
-
-[`demo_heldout.py`](demo_heldout.py) 在与 `demo.py` 相同的对齐 token 上读取公开的 GPT-2 SAE。它调用 [`rss_validation.evaluate_persistence`](rss_validation.py)：5 条选择变体上运行 `rss`，另外 10 条上运行 `held_out_rate`。空支撑集没有保持率，表里打印 `NaN`。只按幅度选取的那一列是这个 demo 内部、同等大小的对照。论文里的 0.758 是 Figure 4 的随机基线。
+**留出验证。** 在 5 个 prompt 变体上选择 RSS 特征，再用 GPT-2 Small 检验其在另外 10 个变体上的方向一致性。
 
 ```bash
-python demo_heldout.py                              # 3 个 prompt，2 种改写
-python demo_heldout.py --max-prompts 24 --all-settings
+python demo_heldout.py
 ```
 
-已经提取好的激活用同一个函数。`a0` 的形状是 `(F,)`，两组变体的形状是 `(5, F)` 和 `(10, F)`。
+[`rss_validation.py`](rss_validation.py) 提供评估函数，[`heldout_variants.py`](heldout_variants.py) 提供额外的测试 prompt。
 
-```python
-from rss_validation import evaluate_persistence
-
-r = evaluate_persistence(a0, a_selection, a_heldout)
-```
-
-[`rss_readout.py`](rss_readout.py) 接收权重、偏置和阈值都已固定的线性探针。RSS 仍在原始 SAE 特征上计算。如果探针读的是标准化特征，`train_mean` 和 `train_scale` 来自探针自己的训练集，并且一起传入。[`demo_readout.py`](demo_readout.py) 可以在合成例子上运行，也可以读一个目录里的 `.npy` 数组。合成例子的打印结果是集成检查。主要结果里 Gemma 和 Llama 的数字是论文结果。
+**冻结读出评估。** 使用固定的线性探针评估重复失败预测、logit 重构和读出恢复。
 
 ```bash
 python demo_readout.py --example
-python demo_readout.py --data-dir /path/to/arrays --json /path/to/summary.json
+python demo_readout.py --data-dir /path/to/arrays
 ```
 
-每一行是一个 prompt 的一种改写。这一行里的选择变体和留出变体互不重叠。
+核心实现位于 [`rss_readout.py`](rss_readout.py)。运行 `python demo_readout.py --example --export-example ./example_data` 可查看所需的 `.npy` 数据格式。
 
-| 文件 | 形状 | 内容 |
-|---|---|---|
-| `clean.npy` | `(N, F)` | 原始 prompt 的原始 SAE 激活 |
-| `selection.npy` | `(N, 5, F)` | 5 条选择变体 |
-| `heldout.npy` | `(N, 10, F)` | 10 条留出变体 |
-| `labels.npy` | `(N,)` | 类别符号 `-1` 或 `+1` |
-| `weights.npy` | `(F,)` | 冻结探针权重，特征顺序与激活一致 |
-| `bias.npy` | 标量 | 冻结偏置 |
-| `threshold.npy` | 标量 | 冻结决策阈值 |
-| `train_mean.npy` | `(F,)`，可选 | 训练集均值，与 `train_scale.npy` 成对提供 |
-| `train_scale.npy` | `(F,)`，可选 | 训练集上的正尺度，与 `train_mean.npy` 成对提供 |
-
-风险分数用原始 prompt 和 5 条选择变体。留出失败、logit 重构和恢复用 10 条留出变体。恢复把选中的探针输入写回干净值，其余特征保持不变。
+**注意：** 留出 Demo 使用额外编写的变体，读出示例使用合成数据，均不代表完整复现论文实验。
 
 ---
 

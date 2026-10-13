@@ -4,7 +4,7 @@
   python demo_readout.py --example --export-example ./example_readout_data
   python demo_readout.py --data-dir /path/to/real_readout_arrays
 
-Array shapes, labels, frozen weights and the split rules are in the README Demo section.
+`--export-example` writes the `.npy` files this script expects.
 The example does NOT reproduce the Gemma/Llama safety-probe results in the paper.
 """
 import argparse

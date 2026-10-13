@@ -320,12 +320,7 @@ support, direction, mean_rss = rss(a_sel - a0)
 rate = held_out_rate(a_ho - a0, support, direction)   # one value per selected feature
 ```
 
-`held_out_rate` is the held out response rate of Equation 20 in the paper, the quantity in Figure 4A. Both functions
-raise an error for nan or inf values, a wrong shape or a parameter outside its range, so a bad input never returns a
-plausible number. [`rss_validation.py`](rss_validation.py) selects on one activation array and scores the other.
-[`demo_heldout.py`](demo_heldout.py) runs that check on the prompts in [`demo.py`](demo.py). A probe that is already
-trained is scored by [`rss_readout.py`](rss_readout.py) and [`demo_readout.py`](demo_readout.py). The commands and
-array layout are in the Demo section.
+For held-out validation and frozen-readout evaluation, see [Additional Demos](#additional-demos).
 
 ---
 
@@ -444,59 +439,26 @@ local edits, and typed substitution moves a different set of features. Layers 4,
 0.717, 0.492 and 0.390, with 23 or 24 of 24 prompts in the same direction. With 1,000 generated prompts the paper
 reports gaps of 0.939 to 0.979 for these four layers.
 
-The five variants above are the selection set. The files below keep that set for choosing features, then check what
-happens on prompts and labels that selection never sees.
+### Additional Demos
 
-[`heldout_variants.py`](heldout_variants.py) adds ten hand-written prompts for each of the six transformations. The
-target phrase stays verbatim and occurs once. This is a separate sample from the held-out operator draws in the paper.
-
-[`demo_heldout.py`](demo_heldout.py) reads the public GPT-2 SAE at the same aligned token as `demo.py`. It calls
-[`rss_validation.evaluate_persistence`](rss_validation.py), which runs `rss` on the five selection variants and
-`held_out_rate` on the ten others. An empty support has no rate, and the table prints `NaN`. The magnitude-only column
-is a same-size control inside this demo. The paper's 0.758 rate is the random baseline in Figure 4.
+**Held-out Validation.** Select RSS features from five prompt variants and test their directional consistency on ten unseen variants using GPT-2 Small.
 
 ```bash
-python demo_heldout.py                              # 3 prompts, 2 transformations
-python demo_heldout.py --max-prompts 24 --all-settings
+python demo_heldout.py
 ```
 
-Activations you have already extracted use the same function. `a0` has shape `(F,)`, and the two variant arrays have
-shapes `(5, F)` and `(10, F)`.
+[`rss_validation.py`](rss_validation.py) provides the evaluation function, and [`heldout_variants.py`](heldout_variants.py) supplies the additional prompts.
 
-```python
-from rss_validation import evaluate_persistence
-
-r = evaluate_persistence(a0, a_selection, a_heldout)
-```
-
-[`rss_readout.py`](rss_readout.py) takes a linear probe whose weights, bias and threshold are already fixed. RSS still
-uses raw SAE features. If the probe reads standardized features, `train_mean` and `train_scale` come from the probe's
-own training set and are passed in together. [`demo_readout.py`](demo_readout.py) runs the calculation on a synthetic
-example, or on a directory of `.npy` arrays. The synthetic printout is an integration check. The Gemma and Llama
-numbers in Main Results are the paper results.
+**Frozen Readout Evaluation.** Evaluate recurrent failure prediction, logit reconstruction, and readout restoration using a fixed linear probe.
 
 ```bash
 python demo_readout.py --example
-python demo_readout.py --data-dir /path/to/arrays --json /path/to/summary.json
+python demo_readout.py --data-dir /path/to/arrays
 ```
 
-Each row is one prompt under one transformation. Selection and held-out variants in that row stay disjoint.
+[`rss_readout.py`](rss_readout.py) implements the evaluation. To inspect the required `.npy` input format, run `python demo_readout.py --example --export-example ./example_data`.
 
-| File | Shape | Contents |
-|---|---|---|
-| `clean.npy` | `(N, F)` | raw SAE activations of the clean prompts |
-| `selection.npy` | `(N, 5, F)` | the five selection variants |
-| `heldout.npy` | `(N, 10, F)` | the ten held-out variants |
-| `labels.npy` | `(N,)` | class signs `-1` or `+1` |
-| `weights.npy` | `(F,)` | frozen probe weights, in the same feature order |
-| `bias.npy` | scalar | frozen bias |
-| `threshold.npy` | scalar | frozen decision threshold |
-| `train_mean.npy` | `(F,)`, optional | training-set mean, with `train_scale.npy` |
-| `train_scale.npy` | `(F,)`, optional | positive training-set scale, with `train_mean.npy` |
-
-Risk scores use the clean prompt and the five selection variants. Held-out failure, logit reconstruction and
-restoration use the ten held-out variants. Restoration writes the selected probe inputs back to their clean values and
-leaves every other feature unchanged.
+**Note:** The held-out demo uses a separate set of hand-written variants, and the readout example uses synthetic data. Neither reproduces the paper's full experiments.
 
 ---
 
