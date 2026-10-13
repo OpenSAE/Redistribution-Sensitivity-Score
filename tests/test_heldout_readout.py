@@ -1,4 +1,4 @@
-"""P0: leakage-safe held-out validation and frozen linear readout evaluation."""
+"""Held-out validation and frozen linear readout evaluation."""
 
 import numpy as np
 import pytest
