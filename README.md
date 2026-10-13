@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>📄 arXiv paper coming soon</b> &nbsp; | &nbsp;
-  <a href="https://uniquemax2005.github.io/rss-redistribution/"><b>🎞️ 5-minute tutorial</b></a> &nbsp; | &nbsp;
+  <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><b>🎞️ 5-minute tutorial</b></a> &nbsp; | &nbsp;
   <a href="#-demo"><b>🧪 Demo</b></a>
 </p>
 
@@ -24,10 +24,10 @@ same direction in at least four variants. MeanRSS averages their absolute respon
 ## 🎞️ 5-Minute Tutorial
 
 <p align="center">
-  <a href="https://uniquemax2005.github.io/rss-redistribution/"><img src="assets/tour_preview.png" alt="5-minute tutorial" width="900"/></a>
+  <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><img src="assets/tour_preview.png" alt="5-minute tutorial" width="900"/></a>
 </p>
 
-💻 Click to open the [tutorial](https://uniquemax2005.github.io/rss-redistribution/) in your browser
+💻 Click to open the [tutorial](https://opensae.github.io/Redistribution-Sensitivity-Score/) in your browser
 
 ---
 
