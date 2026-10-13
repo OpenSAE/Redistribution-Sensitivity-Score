@@ -1,0 +1,10 @@
+# Exact versions that produced the demo output in the README, with Python 3.12.
+# pip install -r requirements-lock.txt
+numpy==2.5.0
+matplotlib==3.11.0
+torch==2.11.0
+transformer-lens==3.5.0
+sae-lens==6.44.4
+transformers==5.12.1
+huggingface-hub==1.21.0
+safetensors==0.8.0
