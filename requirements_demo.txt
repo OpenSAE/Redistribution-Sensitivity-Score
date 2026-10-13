@@ -1,5 +1,5 @@
 # Exact versions that produced the demo output in the README, with Python 3.12.
-# pip install -r requirements-lock.txt
+# pip install -r requirements_demo.txt
 numpy==2.5.0
 matplotlib==3.11.0
 torch==2.11.0

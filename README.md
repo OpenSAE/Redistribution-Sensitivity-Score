@@ -272,7 +272,7 @@ pip install -r requirements.txt
 
 `rss.py` needs only NumPy, so `pip install numpy` is enough for the selector. The demo also needs PyTorch, TransformerLens,
 SAE Lens and Matplotlib. The demo output below comes from Python 3.12 with the versions in
-[`requirements-lock.txt`](requirements-lock.txt), and `pip install -r requirements-lock.txt` installs exactly those.
+[`requirements_demo.txt`](requirements_demo.txt), and `pip install -r requirements_demo.txt` installs exactly those.
 
 ✅ **Tests.** `python -m pytest` checks the properties the paper relies on. They cover the strict threshold, an empty
 support that stays unavailable, Propositions 1 and 2, invariance to scale and to the order of features and variants,

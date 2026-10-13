@@ -228,7 +228,7 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`rss.py` 只依赖 NumPy，只用选择器时 `pip install numpy` 就够了。demo 另需 PyTorch、TransformerLens、SAE Lens 和 Matplotlib。下面的 demo 输出由 Python 3.12 和 [`requirements-lock.txt`](requirements-lock.txt) 里的版本得到，`pip install -r requirements-lock.txt` 会装上完全相同的版本。
+`rss.py` 只依赖 NumPy，只用选择器时 `pip install numpy` 就够了。demo 另需 PyTorch、TransformerLens、SAE Lens 和 Matplotlib。下面的 demo 输出由 Python 3.12 和 [`requirements_demo.txt`](requirements_demo.txt) 里的版本得到，`pip install -r requirements_demo.txt` 会装上完全相同的版本。
 
 ✅ **测试。** `python -m pytest` 检查论文依赖的性质，包括严格阈值、空支撑集记为不可用、Proposition 1 和 2、对尺度以及特征和变体顺序的不变性、输入检查，以及两份 README 快速上手的输出。每次 push 都由 GitHub Actions 自动运行。
 
