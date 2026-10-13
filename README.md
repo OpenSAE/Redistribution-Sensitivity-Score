@@ -27,10 +27,7 @@ same direction in at least four variants. MeanRSS averages their absolute respon
   <a href="https://uniquemax2005.github.io/rss-redistribution/"><img src="assets/tour_preview.png" alt="5-minute tutorial" width="900"/></a>
 </p>
 
-💻 Click the preview to open the tutorial in your browser, or go to
-<https://uniquemax2005.github.io/rss-redistribution/>. Use the arrow keys to move between slides. Press N for the talk
-track and D for details on each slide. The same page is the single file [`docs/index.html`](docs/index.html), which also
-works offline.
+💻 Click to open the [tutorial](https://uniquemax2005.github.io/rss-redistribution/) in your browser
 
 ---
 
@@ -52,28 +49,14 @@ works offline.
 
 ---
 
-## 💡 Why RSS?
-
-Sparse autoencoders, or SAEs, decompose dense language model activations into sparse features. Related inputs can
-change which features respond, and prompt variations such as added context, formatting or word substitution can also
-change model behavior. Using SAE features to describe this variation requires separating responses specific to one
-input from patterns that recur across related inputs.
-
-Tracking one feature shows its response but misses changes elsewhere. Aggregate activation distances summarize the
-overall change but do not identify the features that carry it. We call the change in how activity is distributed across
-the sparse basis representation redistribution. RSS selects the features whose changes are large and recur in one
-direction. It fixes them on one set of variants and evaluates them on disjoint variants.
-
-A recurring change need not matter downstream. A selected feature can receive little readout weight, contributions of
-different features can cancel, and a change in readout score need not cross the decision threshold. We therefore
-measure the contribution of the selected changes to a fixed linear readout separately and compare it with the margin
-left on the clean input.
-
----
-
 ## 📐 What RSS Measures
 
-🧩 **Feature changes.** All quantities are defined for one pretrained SAE, layer, base prompt and transformation
+<details>
+<summary>🧩 Feature changes.</summary>
+
+<br>
+
+All quantities are defined for one pretrained SAE, layer, base prompt and transformation
 setting. Let $`x_0`$ be the clean prompt and $`x_v`$ with $`v\in V`$ its transformed variants. At the aligned target
 position, $`a_f(x)`$ is the activation of feature $`f`$. Its change and average response magnitude are
 
@@ -81,14 +64,28 @@ $$\delta_{v,f}=a_f(x_v)-a_f(x_0),\qquad h_f=\frac{1}{\lvert V\rvert}\sum_{v\in V
 
 Because $`h_f`$ averages absolute changes, opposite directions do not cancel.
 
-🔁 **Recurrence and direction.** Let $`n_f^{+}`$ count the $`n`$ selector observations greater than $`\tau`$ and $`n_f^{-}`$
+</details>
+
+<details>
+<summary>🔁 Recurrence and direction.</summary>
+
+<br>
+
+Let $`n_f^{+}`$ count the $`n`$ selector observations greater than $`\tau`$ and $`n_f^{-}`$
 those less than $`-\tau`$. Then
 
 $$r_f=\frac{n_f^{+}+n_f^{-}}{n},\qquad c_f=\frac{\max(n_f^{+},n_f^{-})}{n_f^{+}+n_f^{-}},\qquad s_f=\mathrm{sign}(n_f^{+}-n_f^{-}).$$
 
 Here $`r_f`$ measures recurrence, $`c_f`$ directional consistency and $`s_f`$ the dominant direction.
 
-🎯 **The RSS support and MeanRSS.** Among the $`M`$ features with the largest $`h_f`$, a feature is eligible when
+</details>
+
+<details>
+<summary>🎯 The RSS support and MeanRSS.</summary>
+
+<br>
+
+Among the $`M`$ features with the largest $`h_f`$, a feature is eligible when
 $`r_f\ge\rho`$ and $`c_f\ge\kappa`$. RSS keeps the $`k=\min(K,\lvert\mathcal E_M\rvert)`$ eligible features with the largest
 $`h_f`$ as the responsive support $`S`$, and
 
@@ -97,7 +94,14 @@ $$\mathrm{MeanRSS}=\frac{1}{\lvert S\rvert}\sum_{f\in S}h_f .$$
 We use $`\rho=\kappa=0.8`$, $`\tau=10^{-5}`$, $`M=400`$ and $`K=20`$. With $`n=5`$ observations, every selected feature changes
 in its dominant direction at least four times and in the opposite direction at most once.
 
-📏 **Normalized MeanRSS and held out contrast.** To compare SAEs of different scale, average MeanRSS over prompts $`i`$
+</details>
+
+<details>
+<summary>📏 Normalized MeanRSS and held out contrast.</summary>
+
+<br>
+
+To compare SAEs of different scale, average MeanRSS over prompts $`i`$
 for each setting $`g`$ and divide by the mean of the six settings,
 
 $$R_g=\mathrm{mean}_i\,\mathrm{MeanRSS}_{i,g},\qquad \widetilde R_g=\frac{R_g}{\frac{1}{6}\sum_{g'}R_{g'}} .$$
@@ -108,7 +112,14 @@ $`\mathcal C`$ the four context and wrapper settings and $`\mathcal L`$ the two 
 
 $$\Delta(A)=\frac{1}{4}\sum_{g\in\mathcal C}\widetilde H_g(A)-\frac{1}{2}\sum_{g\in\mathcal L}\widetilde H_g(A).$$
 
-🛡️ **Margin and erosion.** A frozen linear probe reads standardized activations $`\widetilde{\mathbf a}(x)`$ with score
+</details>
+
+<details>
+<summary>🛡️ Margin and erosion.</summary>
+
+<br>
+
+A frozen linear probe reads standardized activations $`\widetilde{\mathbf a}(x)`$ with score
 $`z(x)=\mathbf w^\top\widetilde{\mathbf a}(x)+b`$ and threshold $`t`$. For class sign $`y\in\lbrace -1,+1\rbrace`$ the
 margin is $`m(x)=y\,[z(x)-t]`$, so a positive margin means a correct decision, and $`m_0=m(x_0)`$ is the clean margin.
 Over a variant set $`U`$, feature $`f`$ erodes the margin by
@@ -119,14 +130,28 @@ For a selected feature this factors exactly as $`e_f^U=-y\,w_f\,s_f\,A_f^U\,\eta
 standardized response and $`\eta_f^U\in[-1,1]`$ its alignment with the selected direction. On the selection variants
 the full erosion and the part carried by the support are $`E=\sum_f e_f`$ and $`E_S=\sum_{f\in S}e_f`$.
 
-🧾 **Residual margin and retention.** Subtracting erosion from the clean margin gives the residual margins
+</details>
+
+<details>
+<summary>🧾 Residual margin and retention.</summary>
+
+<br>
+
+Subtracting erosion from the clean margin gives the residual margins
 $`m_{\mathrm{res}}=m_0-E`$ and $`m_{\mathrm{res}}^{S}=m_0-E_S`$. The full residual margin equals the average transformed
 margin on the selection variants. On held out variants, margin contribution retention is the share of absolute
 contribution kept by the support,
 
 $$\mathrm{MCR}=\frac{\sum_{f\in S}\lvert e_f^{\mathrm{ho}}\rvert}{\sum_f\lvert e_f^{\mathrm{ho}}\rvert}.$$
 
-⚠️ **Failure, AUROC and review.** For each test prompt and setting, one realization per operator gives five selection
+</details>
+
+<details>
+<summary>⚠️ Failure, AUROC and review.</summary>
+
+<br>
+
+For each test prompt and setting, one realization per operator gives five selection
 variants and the other two give ten held out variants. A recurrent readout failure means that at least two of the ten
 held out margins are negative. For a risk score $`q`$, AUROC is the probability that a failing case $`i`$ is ranked above
 a case $`j`$ without failure,
@@ -135,7 +160,14 @@ $$\mathrm{AUROC}=\Pr\big(q(i)>q(j)\big).$$
 
 Selective review ranks cases by residual margin and reports the share of held out errors among the riskiest 20%.
 
-🔧 **Reconstruction and restoration.** For a held out variant, the logit change $`d=z(x_v)-z(x_0)`$ is compared with
+</details>
+
+<details>
+<summary>🔧 Reconstruction and restoration.</summary>
+
+<br>
+
+For a held out variant, the logit change $`d=z(x_v)-z(x_0)`$ is compared with
 the support sum $`\widehat d_S=\sum_{f\in S}w_f\widetilde\delta_{v,f}`$ by the coefficient of determination $`R^2`$.
 Restoring the selected readout inputs to their clean values gives
 
@@ -144,11 +176,18 @@ $$m_{\mathrm{cf}}(x_v)=m_0+y\sum_{f\notin S}w_f\widetilde\delta_{v,f}.$$
 A transformed error with $`m_{\mathrm{cf}}(x_v)>0`$ is reversed. This counterfactual changes only the readout
 computation, not the activations of the language model.
 
+</details>
+
 ---
 
 ## 🔎 Comparison of Methods
 
-🧭 **Which features carry the transformation contrast.** RSS is compared with three feature sets that do not look at
+<details>
+<summary>🧭 Which features carry the transformation contrast.</summary>
+
+<br>
+
+RSS is compared with three feature sets that do not look at
 the transformation. Clean fixed takes features selected from clean prompts. Global fixed takes features selected by
 activity across the clean corpus. Dictionary mean is an equal average over all SAE features. Each set is evaluated on
 held out variants with $`\Delta(A)`$, and a larger value means a clearer contrast. Numbers are averages over the 27 SAEs
@@ -161,7 +200,14 @@ in Figure 3.
 | Global fixed | 0.365 | ✅ 26 of 27 |
 | Dictionary mean | ❌ 0.306 | ✅ 24 of 27 |
 
-🎯 **Whether the selected direction persists.** Large changes might already be stable without the recurrence and
+</details>
+
+<details>
+<summary>🎯 Whether the selected direction persists.</summary>
+
+<br>
+
+Large changes might already be stable without the recurrence and
 consistency constraints. We therefore compare RSS with selection by magnitude alone, using the same candidate pool and
 support size. The number is the held out response rate in the selected direction for the two safety probes.
 
@@ -170,7 +216,14 @@ support size. The number is the held out response rate in the selected direction
 | 🏆 **RSS** | ✅ **0.876** | ✅ **0.871** |
 | Magnitude alone | 0.816 | 0.794 |
 
-🛡️ **Which score ranks readout failures.** All scores are computed on the five selection variants and judged by AUROC
+</details>
+
+<details>
+<summary>🛡️ Which score ranks readout failures.</summary>
+
+<br>
+
+All scores are computed on the five selection variants and judged by AUROC
 for recurrent failure on the ten held out variants. MeanRSS uses only the response size of the support, and the second
 row weights it by absolute probe coefficients. Clean margin uses the probe on the clean prompt alone. The other rows
 use the erosion terms defined above.
@@ -185,7 +238,14 @@ use the erosion terms defined above.
 | 🏆 **RSS residual margin** $`m_{\mathrm{res}}^{S}`$ | ✅ **20 and 19** | ✅ **0.935** | ✅ **0.958** |
 | Full residual margin $`m_{\mathrm{res}}`$ | 415 and 862 | 0.965 | 0.964 |
 
-🔬 **Which features localize the readout change.** Each support has the size of the RSS support. Mismatched setting
+</details>
+
+<details>
+<summary>🔬 Which features localize the readout change.</summary>
+
+<br>
+
+Each support has the size of the RSS support. Mismatched setting
 uses the RSS support selected for another transformation. Global instability uses the features that vary most across
 the corpus, and random uses random features. $`R^2`$ measures how well the support reconstructs held out logit changes,
 and errors reversed is the share of transformed probe errors corrected by restoring the support.
@@ -196,6 +256,8 @@ and errors reversed is the share of transformed probe errors corrected by restor
 | Mismatched setting | 0.438 | 0.490 | 60.3% | 61.1% |
 | Global instability | ❌ 0.017 | ❌ 0.009 | ❌ 6.7% | ❌ 2.3% |
 | Random | ❌ 0.014 | ❌ 0.017 | ❌ 1.2% | ❌ 1.5% |
+
+</details>
 
 ---
 
@@ -269,6 +331,8 @@ plausible number.
 <details>
 <summary>🔁 Figure 2. Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs</summary>
 
+<br>
+
 Normalized MeanRSS $`\widetilde R_g`$ averaged over the 27 SAEs with equal weight.
 
 | Irrelevant context | Distractor context | Metalinguistic wrapper | Format wrapper | Punctuation noise | Typed lexical substitution |
@@ -285,6 +349,8 @@ is 0.95 for punctuation edits, 0.74 for irrelevant context and 0.50 for the form
 <details>
 <summary>🧭 Figure 3. Response contrast on variants excluded from feature selection</summary>
 
+<br>
+
 RSS gives a stronger context and wrapper versus local edit separation than each comparison method in 24 to 26 of 27
 SAEs and gives the largest contrast in 22. On held out variants, RSS supports respond in the selected direction at a
 rate of 0.952, compared with 0.758 for random supports matched in size and candidate pool.
@@ -293,6 +359,8 @@ rate of 0.952, compared with 0.758 for random supports matched in size and candi
 
 <details>
 <summary>🎯 Figure 4. Feature validation on held out variants</summary>
+
+<br>
 
 | | Gemma 3 4B | Llama 3.1 8B |
 |---|:---:|:---:|
@@ -310,6 +378,8 @@ than 90% in both models.
 <details>
 <summary>⚖️ Figure 5. Readout change and recurrent readout failure on held out variants</summary>
 
+<br>
+
 Probe AUROC stays above 0.90 under every transformation, yet 4.2% to 9.5% of decisions change. Full erosion estimated
 on selection variants correlates with held out erosion at 0.923 for Gemma and 0.896 for Llama, and RSS support erosion
 at 0.737 and 0.793. Clean margin alone gives recurrent failure AUROCs of 0.863 and 0.901. Subtracting RSS support
@@ -320,6 +390,8 @@ offline rankings with known class labels.
 
 <details>
 <summary>🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout</summary>
+
+<br>
 
 | | Full readout | RSS support |
 |---|:---:|:---:|
@@ -377,24 +449,26 @@ Captions are taken from the paper.
 
 | Figure | Caption | In the demo |
 |---|---|:---:|
-| [Figure&nbsp;1](assets/figures/fig1.png) | RSS under prompt transformations. In the illustrated five-variant selection, boxed features change in the same direction in at least four variants. MeanRSS averages their absolute response magnitudes. | |
-| [Figure&nbsp;2](assets/figures/fig2.png) | Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs. Each SAE's six setting means are divided by their average, so the plot compares transformation profiles rather than absolute activation scales. Large outlined diamonds show averages across SAEs. | ✅ panel A |
-| [Figure&nbsp;3](assets/figures/fig3.png) | Response contrast on variants excluded from feature selection. Each point is the normalized context and wrapper mean minus the local edit mean for the indicated feature set and SAE layer. Clean fixed: features selected from clean prompts. Global fixed: features selected by activity across the clean corpus. Dictionary mean: equal average over all SAE features. | |
-| [Figure&nbsp;4](assets/figures/fig4.png) | Feature validation on held out variants. A, response rate in the direction chosen on selection variants, comparing RSS with magnitude alone. B, mean $`\lvert e_f^{\mathrm{ho}}\rvert`$ for RSS features and unselected features matched by readout coefficient magnitude. C–D, MCR as the support cap $`K`$ varies. The $`\lvert e_f\rvert`$ ranking uses contributions from the selection variants. | |
-| [Figure&nbsp;5](assets/figures/fig5.png) | Readout change and recurrent readout failure on held out variants. A, Spearman correlation with held out margin erosion and AUROC for recurrent failure. Correlation measures erosion transfer, while AUROC measures failure ranking; residual margin correlations are oriented toward increasing risk. B, clean margin versus full residual margin for Gemma 3 4B, colored by held out recurrent failure. The dashed line marks zero average selection margin. | |
-| [Figure&nbsp;6](assets/figures/fig6.png) | Utility of RSS supports selected for each prompt and transformation within the frozen readout. A, $`R^2`$ for reconstructed held out logit changes. B, readout errors reversed by restoring selected feature values. C–D, errors and harmful false negatives captured at a 20% offline review budget using known labels. Error bars show 95% bootstrap confidence intervals. | |
-| [Figure&nbsp;S1](assets/figures/figS1.png) | Normalized MeanRSS profiles for the six transformations across all sampled layers of the eight models. Normalization follows Figure 2. | ✅ `--layer` |
-| [Figure&nbsp;S2](assets/figures/figS2.png) | Overlap between the feature supports selected under different transformations, averaged over all units and 1,000 prompts. A, pairwise Jaccard overlap between transformations; B, averages within each model. IC denotes irrelevant context, DC distractor context, MW metalinguistic wrapper, FW format wrapper, PN punctuation noise, and TL typed lexical substitution. | ✅ panel B |
-| [Figure&nbsp;S3](assets/figures/figS3.png) | Normalized MeanRSS by prompt topic. A, topic level means for each transformation; B, the ratio of the context and wrapper mean to the local edit mean for each topic. Transformation abbreviations as in Figure S2. | |
-| [Figure&nbsp;S4](assets/figures/figS4.png) | Profile of the six transformations after removing one model at a time, compared with the profile over all units. Transformation abbreviations as in Figure S2. | |
-| [Figure&nbsp;S5](assets/figures/figS5.png) | Comparison of the main feature selection rule with an alternative rule that treats all fifteen variants individually. A, mean support size; B, rates of undersized and empty selections; C, Jaccard overlap between the supports chosen by the two rules; D, unit level normalized MeanRSS under the two rules. Transformation abbreviations as in Figure S2. | |
-| [Figure&nbsp;S6](assets/figures/figS6.png) | Probe AUROC for the two safety readouts on untransformed test prompts and under each transformation. Transformation abbreviations as in Figure S2. Error bars show 95% bootstrap confidence intervals. | |
-| [Figure&nbsp;S7](assets/figures/figS7.png) | Normalized MeanRSS and margin erosion on held out variants for each transformation, evaluated on the audited safety units. Transformation abbreviations as in Figure S2. Error bars show 95% bootstrap confidence intervals. | |
-| [Figure&nbsp;S8](assets/figures/figS8.png) | Effect of transformation strength on the audited safety units. A, margin erosion under three transformations rebuilt at four increasing intensity levels, with 95% bootstrap confidence intervals. B, MeanRSS for the same series, relative to the weakest level. | |
-| [Figure&nbsp;S9](assets/figures/figS9.png) | Augmentation guided by MeanRSS compared with uniform sampling. A, differences between the two sampling methods in clean, mean, and worst transformation AUROC, together with the reduction in harmful false negative rate under the worst transformation. Error bars show 95% bootstrap confidence intervals. B, harmful false negative rate averaged over the six transformations across five runs. Bars show the run mean and whiskers the observed range. | |
+| [Figure&nbsp;1](assets/figures/fig1.png) | RSS under prompt transformations. | |
+| [Figure&nbsp;2](assets/figures/fig2.png) | Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs. | ✅ panel A |
+| [Figure&nbsp;3](assets/figures/fig3.png) | Response contrast on variants excluded from feature selection. | |
+| [Figure&nbsp;4](assets/figures/fig4.png) | Feature validation on held out variants. | |
+| [Figure&nbsp;5](assets/figures/fig5.png) | Readout change and recurrent readout failure on held out variants. | |
+| [Figure&nbsp;6](assets/figures/fig6.png) | Utility of RSS supports selected for each prompt and transformation within the frozen readout. | |
+| [Figure&nbsp;S1](assets/figures/figS1.png) | Normalized MeanRSS profiles for the six transformations across all sampled layers of the eight models. | ✅ `--layer` |
+| [Figure&nbsp;S2](assets/figures/figS2.png) | Overlap between the feature supports selected under different transformations, averaged over all units and 1,000 prompts. | ✅ panel B |
+| [Figure&nbsp;S3](assets/figures/figS3.png) | Normalized MeanRSS by prompt topic. | |
+| [Figure&nbsp;S4](assets/figures/figS4.png) | Profile of the six transformations after removing one model at a time, compared with the profile over all units. | |
+| [Figure&nbsp;S5](assets/figures/figS5.png) | Comparison of the main feature selection rule with an alternative rule that treats all fifteen variants individually. | |
+| [Figure&nbsp;S6](assets/figures/figS6.png) | Probe AUROC for the two safety readouts on untransformed test prompts and under each transformation. | |
+| [Figure&nbsp;S7](assets/figures/figS7.png) | Normalized MeanRSS and margin erosion on held out variants for each transformation, evaluated on the audited safety units. | |
+| [Figure&nbsp;S8](assets/figures/figS8.png) | Effect of transformation strength on the audited safety units. | |
+| [Figure&nbsp;S9](assets/figures/figS9.png) | Augmentation guided by MeanRSS compared with uniform sampling. | |
 
 <details>
 <summary>SAEs used in the paper</summary>
+
+<br>
 
 From Table S3 of the paper. All 27 SAEs are public checkpoints.
 
@@ -415,6 +489,8 @@ The demo loads the GPT-2 Small SAEs through SAE Lens as `gpt2-small-res-jb` at `
 
 <details>
 <summary>Show all figures</summary>
+
+<br>
 
 | | |
 |---|---|
