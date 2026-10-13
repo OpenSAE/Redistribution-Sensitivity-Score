@@ -1,9 +1,6 @@
-# 🔥 RSS: Representation Redistribution in Sparse Autoencoders
+# RSS: Representation Redistribution in Sparse Autoencoders
 
-**Ziye Mei, Haotian Ma**<br>
-University of Wisconsin–Madison
-
-🌍 [English](README.md) | [中文](README_cn.md)
+🌍 Languages: [English](README.md) | [中文](README_cn.md)
 
 👉 TL;DR. Prompt transformations designed to keep the request the same can still redistribute activity across sparse
 autoencoder features. We introduce the redistribution sensitivity score, RSS, which selects large feature responses that
@@ -274,7 +271,8 @@ plausible number.
 
 ## 📊 Main Results
 
-#### 🔁 Figure 2. Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs
+<details>
+<summary>🔁 Figure 2. Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs</summary>
 
 Normalized MeanRSS $`\widetilde R_g`$ averaged over the 27 SAEs with equal weight.
 
@@ -287,13 +285,19 @@ interval of 0.867 to 0.881. It does so for all 1,000 prompts, and every context 
 edits for 997. Across four intensity levels, the median prompt level Spearman correlation between intensity and MeanRSS
 is 0.95 for punctuation edits, 0.74 for irrelevant context and 0.50 for the format wrapper.
 
-#### 🧭 Figure 3. Response contrast on variants excluded from feature selection
+</details>
+
+<details>
+<summary>🧭 Figure 3. Response contrast on variants excluded from feature selection</summary>
 
 RSS gives a stronger context and wrapper versus local edit separation than each comparison method in 24 to 26 of 27
 SAEs and gives the largest contrast in 22. On held out variants, RSS supports respond in the selected direction at a
 rate of 0.952, compared with 0.758 for random supports matched in size and candidate pool.
 
-#### 🎯 Figure 4. Feature validation on held out variants
+</details>
+
+<details>
+<summary>🎯 Figure 4. Feature validation on held out variants</summary>
 
 | | Gemma 3 4B | Llama 3.1 8B |
 |---|:---:|:---:|
@@ -306,7 +310,10 @@ The sign rule of the factorization agrees with the sign of the held out contribu
 does not maximize retention. Ranking by $`\lvert e_f\rvert`$ on the selection variants uses the readout and keeps more
 than 90% in both models.
 
-#### ⚖️ Figure 5. Readout change and recurrent readout failure on held out variants
+</details>
+
+<details>
+<summary>⚖️ Figure 5. Readout change and recurrent readout failure on held out variants</summary>
 
 Probe AUROC stays above 0.90 under every transformation, yet 4.2% to 9.5% of decisions change. Full erosion estimated
 on selection variants correlates with held out erosion at 0.923 for Gemma and 0.896 for Llama, and RSS support erosion
@@ -314,7 +321,10 @@ at 0.737 and 0.793. Clean margin alone gives recurrent failure AUROCs of 0.863 a
 erosion from the clean margin gives 0.935 and 0.958, and the full residual margins give 0.965 and 0.964. These are
 offline rankings with known class labels.
 
-#### 🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout
+</details>
+
+<details>
+<summary>🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout</summary>
 
 | | Full readout | RSS support |
 |---|:---:|:---:|
@@ -327,6 +337,8 @@ offline rankings with known class labels.
 RSS reconstructs held out logit changes with $`R^2`$ of about 0.58 and 0.63. Restoring the selected readout inputs to
 their clean values reverses 72.2% and 71.8% of transformed probe errors. The compact object is the set of changes used
 for each case, not a single reduced probe that replaces the full clean computation.
+
+</details>
 
 ---
 

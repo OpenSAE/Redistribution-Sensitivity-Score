@@ -1,9 +1,6 @@
-# 🔥 RSS：稀疏自编码器中的表示重分配
+# RSS：稀疏自编码器中的表示重分配
 
-**Ziye Mei, Haotian Ma**<br>
-University of Wisconsin–Madison
-
-🌍 [English](README.md) | [中文](README_cn.md)
+🌍 Languages: [English](README.md) | [中文](README_cn.md)
 
 👉 一句话。按设计不改变请求本身的 prompt 改写，仍会让稀疏自编码器 SAE 的特征重新分配激活。我们提出重分配敏感度分数 RSS，它选出变化大、反复出现且方向一致的特征响应，并在没有参与选择的变体上检验这些特征。在来自 8 个语言模型的 27 个预训练 SAE 上，所测试的改写给出一致可复现的重分配规律。在两个冻结的安全读出上，把 RSS 支撑集的侵蚀与干净 margin 结合，预测反复出错的 AUROC 为 0.935 和 0.958，所用支撑集中位数为 20 和 19 个特征，用全部特征的侵蚀则为 0.965 和 0.964。
 
@@ -205,7 +202,8 @@ rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个
 
 ## 📊 主要结果
 
-#### 🔁 Figure 2. Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs
+<details>
+<summary>🔁 Figure 2. Normalized MeanRSS across six prompt transformations and 27 pretrained SAEs</summary>
 
 27 个 SAE 等权平均的归一化 MeanRSS $`\widetilde R_g`$。
 
@@ -215,11 +213,17 @@ rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个
 
 在全部 27 个 SAE 上，上下文和包装的平均都高于局部改动，平均差 0.874，95% 区间为 0.867 到 0.881。1,000 个 prompt 中每一个都是如此，其中 997 个 prompt 的每一种上下文或包装设置都高于两种局部改动。在四个强度等级上，强度与 MeanRSS 的 prompt 级 Spearman 相关的中位数，标点改动为 0.95，无关上下文为 0.74，格式包装为 0.50。
 
-#### 🧭 Figure 3. Response contrast on variants excluded from feature selection
+</details>
+
+<details>
+<summary>🧭 Figure 3. Response contrast on variants excluded from feature selection</summary>
 
 在 27 个 SAE 中，RSS 区分上下文包装和局部改动的能力强于每一种对比方法的有 24 到 26 个，三者中最强的有 22 个。在留出变体上，RSS 支撑集沿选定方向响应的比例为 0.952，候选池和大小相同的随机支撑集为 0.758。
 
-#### 🎯 Figure 4. Feature validation on held out variants
+</details>
+
+<details>
+<summary>🎯 Figure 4. Feature validation on held out variants</summary>
 
 | | Gemma 3 4B | Llama 3.1 8B |
 |---|:---:|:---:|
@@ -230,11 +234,17 @@ rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个
 
 分解给出的符号规则与留出贡献的符号一致的比例为 97.4% 和 97.1%。RSS 并不追求最大的贡献保留。在选择变体上按 $`\lvert e_f\rvert`$ 排序要用到读出，在两个模型上都能保留 90% 以上。
 
-#### ⚖️ Figure 5. Readout change and recurrent readout failure on held out variants
+</details>
+
+<details>
+<summary>⚖️ Figure 5. Readout change and recurrent readout failure on held out variants</summary>
 
 在每一种改写下，探针 AUROC 都保持在 0.90 以上，但仍有 4.2% 到 9.5% 的决策发生改变。在选择变体上估计的全部侵蚀与留出侵蚀的相关为 Gemma 0.923、Llama 0.896，RSS 支撑集的侵蚀为 0.737 和 0.793。只用干净 margin，反复出错的 AUROC 为 0.863 和 0.901。从干净 margin 中减去 RSS 支撑集的侵蚀，得到 0.935 和 0.958，完整剩余 margin 为 0.965 和 0.964。这些都是用已知类别标签做的离线排序。
 
-#### 🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout
+</details>
+
+<details>
+<summary>🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout</summary>
 
 | | 完整读出 | RSS 支撑集 |
 |---|:---:|:---:|
@@ -245,6 +255,8 @@ rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个
 | 审查 20% 时捕获的有害漏检 | 90.9% 和 93.5% | 87.3% 和 94.4% |
 
 RSS 重建留出 logit 变化的 $`R^2`$ 约为 0.58 和 0.63。把选中特征的读出输入恢复成干净值，可以纠正 72.2% 和 71.8% 的改写错误。这里紧凑的是每个样本用到的那组变化，而不是一个替代完整干净计算的缩小版探针。
+
+</details>
 
 ---
 
