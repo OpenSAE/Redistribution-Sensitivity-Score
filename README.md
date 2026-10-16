@@ -5,7 +5,7 @@
 👉 TL;DR. Prompt changes can redistribute activity across SAE features, even when the underlying request stays the same. **Redistribution Sensitivity Score (RSS)** identifies features that show strong, consistent shifts across these changes.
 
 <p align="center">
-  <b>📄 arXiv paper coming soon</b> &nbsp; | &nbsp;
+  <a href="https://arxiv.org/abs/2610.21240"><b>📄 Paper (arXiv)</b></a> &nbsp; | &nbsp;
   <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><b>🎞️ 5-minute tutorial</b></a> &nbsp; | &nbsp;
   <a href="#-demo"><b>🧪 Demo</b></a>
 </p>
@@ -534,3 +534,20 @@ It uses the open SAEs for [GPT-2 Small](https://huggingface.co/jbloom/GPT2-Small
 [Mistral-7B](https://huggingface.co/JoshEngels/Mistral-7B-Residual-Stream-SAEs) and
 [Llama Scope](https://huggingface.co/OpenMOSS-Team/Llama3_1-8B-Base-LXR-8x), and the
 [WildGuardMix](https://huggingface.co/datasets/allenai/wildguardmix) data.
+
+---
+
+## 📚 Citation
+
+If you use this work, please cite the paper:
+
+```bibtex
+@misc{mei2026redistribution,
+  title = {Representation Redistribution in Sparse Autoencoders},
+  author = {Ziye Mei and Haotian Ma},
+  year = {2026},
+  eprint = {2610.21240},
+  archivePrefix = {arXiv},
+  url = {https://arxiv.org/abs/2610.21240}
+}
+```
