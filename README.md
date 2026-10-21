@@ -104,7 +104,11 @@ in its dominant direction at least four times and in the opposite direction at m
 To compare SAEs of different scale, average MeanRSS over prompts $`i`$
 for each setting $`g`$ and divide by the mean of the six settings,
 
-$$R_g=\mathrm{mean}_i\,\mathrm{MeanRSS}_{i,g},\qquad \widetilde R_g=\frac{R_g}{\frac{1}{6}\sum_{g'}R_{g'}} .$$
+$
+R_g = \frac{1}{N}\sum_{i=1}^{N}\mathrm{MeanRSS}_{i,g},
+\qquad
+\widetilde{R}_g = \frac{R_g}{\frac{1}{6}\sum_{g'=1}^{6}R_{g'}}.
+$
 
 The six values of each SAE then have mean one. For a feature set $`A`$, $`H_g(A)`$ averages $`\lvert\delta_{v,f}\rvert`$
 over prompts, features in $`A`$ and held out variants, and $`\widetilde H_g(A)`$ normalizes it in the same way. With
@@ -331,6 +335,10 @@ For held-out validation and frozen-readout evaluation, see [Additional Demos](#a
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig2.png" alt="Figure 2" width="900"/>
+</p>
+
 Normalized MeanRSS $`\widetilde R_g`$ averaged over the 27 SAEs with equal weight.
 
 | Irrelevant context | Distractor context | Metalinguistic wrapper | Format wrapper | Punctuation noise | Typed lexical substitution |
@@ -349,6 +357,10 @@ is 0.95 for punctuation edits, 0.74 for irrelevant context and 0.50 for the form
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig3.png" alt="Figure 3" width="900"/>
+</p>
+
 RSS gives a stronger context and wrapper versus local edit separation than each comparison method in 24 to 26 of 27
 SAEs and gives the largest contrast in 22. On held out variants, RSS supports respond in the selected direction at a
 rate of 0.952, compared with 0.758 for random supports matched in size and candidate pool.
@@ -359,6 +371,10 @@ rate of 0.952, compared with 0.758 for random supports matched in size and candi
 <summary>🎯 Figure 4. Feature validation on held out variants</summary>
 
 <br>
+
+<p align="center">
+  <img src="assets/figures/fig4.png" alt="Figure 4" width="900"/>
+</p>
 
 | | Gemma 3 4B | Llama 3.1 8B |
 |---|:---:|:---:|
@@ -378,6 +394,10 @@ than 90% in both models.
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig5.png" alt="Figure 5" width="900"/>
+</p>
+
 Probe AUROC stays above 0.90 under every transformation, yet 4.2% to 9.5% of decisions change. Full erosion estimated
 on selection variants correlates with held out erosion at 0.923 for Gemma and 0.896 for Llama, and RSS support erosion
 at 0.737 and 0.793. Clean margin alone gives recurrent failure AUROCs of 0.863 and 0.901. Subtracting RSS support
@@ -390,6 +410,10 @@ offline rankings with known class labels.
 <summary>🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout</summary>
 
 <br>
+
+<p align="center">
+  <img src="assets/figures/fig6.png" alt="Figure 6" width="900"/>
+</p>
 
 | | Full readout | RSS support |
 |---|:---:|:---:|
