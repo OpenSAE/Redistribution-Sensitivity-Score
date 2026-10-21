@@ -486,6 +486,11 @@ python demo/demo_readout.py --data-dir /path/to/arrays
 
 ## 🗺️ Figure Map
 
+<details>
+<summary>📋 Figure index and captions</summary>
+
+<br>
+
 Captions are taken from the paper.
 
 | Figure | Caption | In the demo |
@@ -505,6 +510,8 @@ Captions are taken from the paper.
 | [Figure&nbsp;S7](assets/figures/figS7.png) | Normalized MeanRSS and margin erosion on held out variants for each transformation, evaluated on the audited safety units. | |
 | [Figure&nbsp;S8](assets/figures/figS8.png) | Effect of transformation strength on the audited safety units. | |
 | [Figure&nbsp;S9](assets/figures/figS9.png) | Augmentation guided by MeanRSS compared with uniform sampling. | |
+
+</details>
 
 <details>
 <summary>SAEs used in the paper</summary>
