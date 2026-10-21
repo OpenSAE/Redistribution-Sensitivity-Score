@@ -7,7 +7,7 @@ from heldout_variants import SETTINGS, ensure_disjoint, heldout_variants
 from rss_readout import (FrozenLinearReadout, analyze_case, analyze_dataset,
                          auroc, summarize_cases)
 from rss_validation import evaluate_persistence
-from demo.demo_readout import get_probe, load_arrays, run, save_arrays, synthetic_example
+from assets.demo.demo_readout import get_probe, load_arrays, run, save_arrays, synthetic_example
 
 
 @pytest.mark.parametrize("setting", SETTINGS)
@@ -235,7 +235,7 @@ def test_undefined_auroc_json_is_not_serialized_as_nan(tmp_path):
     arrays["heldout"][:] = arrays["clean"][:, None, :]
     save_arrays(tmp_path / "data", arrays)
     report = tmp_path / "report.json"
-    script = Path(__file__).resolve().parents[1] / "demo" / "demo_readout.py"
+    script = Path(__file__).resolve().parents[1] / "assets" / "demo" / "demo_readout.py"
     p = subprocess.run([sys.executable, str(script), "--data-dir", str(tmp_path / "data"),
                         "--json", str(report)], capture_output=True, text=True, check=True)
     assert "nan" in p.stdout.lower()

@@ -1,8 +1,8 @@
 """Frozen-readout RSS evaluation on explicit data, or a LABELED SYNTHETIC example.
 
-  python demo/demo_readout.py --example
-  python demo/demo_readout.py --example --export-example ./example_readout_data
-  python demo/demo_readout.py --data-dir /path/to/real_readout_arrays
+  python assets/demo/demo_readout.py --example
+  python assets/demo/demo_readout.py --example --export-example ./example_readout_data
+  python assets/demo/demo_readout.py --data-dir /path/to/real_readout_arrays
 
 `--export-example` writes the `.npy` files this script expects.
 The example does NOT reproduce the Gemma/Llama safety-probe results in the paper.
@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import numpy as np
 

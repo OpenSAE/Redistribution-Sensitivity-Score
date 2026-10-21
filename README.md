@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://arxiv.org/abs/2610.21240"><b>📄 Paper (arXiv)</b></a> &nbsp; | &nbsp;
   <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><b>🎞️ 5-minute tutorial</b></a> &nbsp; | &nbsp;
-  <a href="#-demo"><b>🧪 Demo</b></a>
+  <a href="assets/demo/README.md"><b>🧪 Examples</b></a>
 </p>
 
 ## 🎥 Overview
@@ -265,66 +265,43 @@ and errors reversed is the share of transformed probe errors corrected by restor
 
 ---
 
-## ⚙️ Install
+## 🚀 Quickstart
+
+Clone the repository and install NumPy:
 
 ```bash
-git clone https://github.com/UniqueMax2005/rss-redistribution.git
-cd rss-redistribution
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+git clone https://github.com/OpenSAE/Redistribution-Sensitivity-Score.git
+cd Redistribution-Sensitivity-Score
+python -m pip install numpy
 ```
 
-`rss.py` needs only NumPy, so `pip install numpy` is enough for the selector. The demo also needs PyTorch, TransformerLens,
-SAE Lens and Matplotlib. The demo output below comes from Python 3.12 with the versions in
-[`requirements_demo.txt`](requirements_demo.txt), and `pip install -r requirements_demo.txt` installs exactly those.
-
-✅ **Tests.** `python -m pytest` checks the properties the paper relies on. They cover the strict threshold, an empty
-support that stays unavailable, Propositions 1 and 2, invariance to scale and to the order of features and variants,
-input checks and the Quickstart output of both READMEs. GitHub Actions runs them on every push.
-
----
-
-## 🚀 Quickstart
+Extract SAE feature activations at an aligned token position for an original prompt (`clean`), five transformed variants (`selection`), and separate held-out variants (`heldout`):
 
 ```python
 import numpy as np
-from rss import rss
-
-# SAE activations of 5 variants minus the clean prompt, one row per variant and one column per feature
-delta = np.array([[2.0, 0.0, -1.0,  0.3],
-                  [1.8, 0.0, -1.2, -0.3],
-                  [2.2, 0.5, -0.9,  0.3],
-                  [1.9, 0.0, -1.1, -0.3],
-                  [0.0, 0.0, -1.0,  0.3]])
-
-support, direction, mean_rss = rss(delta)   # rho = kappa = 0.8, tau = 1e-5, M = 400, K = 20
-print(support, direction, round(mean_rss, 2))
-# [0 2] [ 1 -1] 1.31
-```
-
-💡 Feature 0 goes up in four of five variants and feature 2 goes down in all five, so both are kept. Feature 3 changes
-every time but flips its direction, so it is dropped.
-
-👉 On GPT-2 Small
-
-```bash
-python demo/demo.py
-```
-
-🧰 **Your own SAE.** Write variants of each clean prompt that keep the request and contain the target phrase exactly
-once. Read the SAE at the last token that overlaps the target phrase, as `sae_features` in [`demo/demo.py`](demo/demo.py) does.
-Split the variants into selection and held out variants before looking at any feature, select on the first set and check
-the selected directions on the second.
-
-```python
 from rss import rss, held_out_rate
 
-# a0 has shape (n_features,), a_sel and a_ho have shape (n_variants, n_features)
-support, direction, mean_rss = rss(a_sel - a0)
-rate = held_out_rate(a_ho - a0, support, direction)   # one value per selected feature
+clean = np.zeros(4)
+selection = np.array([
+    [2.0, 0.0, -1.0,  0.3],
+    [1.8, 0.0, -1.2, -0.3],
+    [2.2, 0.5, -0.9,  0.3],
+    [1.9, 0.0, -1.1, -0.3],
+    [0.0, 0.0, -1.0,  0.3],
+])
+heldout = np.array([
+    [1.5, 0.0, -0.8, 0.1],
+    [2.0, 0.0, -1.2, 0.1],
+])
+support, direction, mean_rss = rss(selection - clean)
+rates = held_out_rate(heldout - clean, support, direction)
+print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
+# [0, 2] [1, -1] 1.31 [1.0, 1.0]
 ```
 
-For held-out validation and frozen-readout evaluation, see [Additional Demos](#additional-demos).
+`rss` returns selected feature indices, dominant response directions and MeanRSS. The held-out rates measure how consistently those directions persist on variants **not used for selection**. Replace these arrays with activations from your own SAE at the same layer and token position; each variant array has shape `(variants, features)`.
+
+[Core API and input contract](docs/CORE_API.md) · [Runnable model examples](assets/demo/README.md)
 
 ---
 
@@ -428,59 +405,6 @@ their clean values reverses 72.2% and 71.8% of transformed probe errors. The com
 for each case, not a single reduced probe that replaces the full clean computation.
 
 </details>
-
----
-
-## 🧪 Demo
-
-`demo/demo.py` runs GPT-2 Small with its public SAE on 24 prompts that we wrote, under six transformations with five
-variants each. It reads the SAE at the last token of the part of the prompt that every variant keeps, applies `rss`
-to each prompt and setting, and reports MeanRSS, the normalized value and the gap between context and wrapper settings
-and local edits. `python demo/demo.py` uses layer 8 and takes about a minute on a CPU. The option `--layer` selects 4, 6
-or 10, the other GPT-2 layers in the paper.
-
-```text
-GPT-2 Small, layer 8, 24 prompts
-
-Transformation            MeanRSS  normalized
-Irrelevant context          2.121       1.107
-Distractor context          2.481       1.295
-Metalinguistic wrapper      1.977       1.032
-Format wrapper              2.341       1.222
-Punctuation noise           1.231       0.643
-Typed substitution          1.344       0.702
-
-Context and wrappers minus local edits: 0.492
-Prompts where context and wrappers move more: 24 / 24
-```
-
-<p align="center">
-  <img src="assets/demo_layer8.png" alt="Demo output" width="850"/>
-</p>
-
-✅ The demo shows the same pattern as the paper. Context and wrapper transformations move the representation more than
-local edits, and typed substitution moves a different set of features. Layers 4, 6, 8 and 10 give gaps of 0.903,
-0.717, 0.492 and 0.390, with 23 or 24 of 24 prompts in the same direction. With 1,000 generated prompts the paper
-reports gaps of 0.939 to 0.979 for these four layers.
-
-### Additional Demos
-
-**Held-out Validation.** Select RSS features from five prompt variants and test their directional consistency on ten unseen variants using GPT-2 Small.
-
-```bash
-python demo/demo_heldout.py
-```
-
-[`rss_validation.py`](rss_validation.py) provides the evaluation function, and [`heldout_variants.py`](heldout_variants.py) supplies the additional prompts.
-
-**Frozen Readout Evaluation.** Evaluate recurrent failure prediction, logit reconstruction, and readout restoration using a fixed linear probe.
-
-```bash
-python demo/demo_readout.py --example
-python demo/demo_readout.py --data-dir /path/to/arrays
-```
-
-[`rss_readout.py`](rss_readout.py) implements the evaluation. To inspect the required `.npy` input format, run `python demo/demo_readout.py --example --export-example ./example_data`.
 
 ---
 

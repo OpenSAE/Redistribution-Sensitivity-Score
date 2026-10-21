@@ -7,7 +7,7 @@
 <p align="center">
   <b>📄 arXiv 论文即将上线</b> &nbsp; | &nbsp;
   <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><b>🎞️ 5 分钟讲解</b></a> &nbsp; | &nbsp;
-  <a href="#-demo"><b>🧪 Demo</b></a>
+  <a href="assets/demo/README.md"><b>🧪 Examples</b></a>
 </p>
 
 ## 🎥 概览
@@ -219,58 +219,43 @@ $$m_{\mathrm{cf}}(x_v)=m_0+y\sum_{f\notin S}w_f\widetilde\delta_{v,f}.$$
 
 ---
 
-## ⚙️ 安装
+## 🚀 快速上手
+
+克隆仓库并安装 NumPy：
 
 ```bash
-git clone https://github.com/UniqueMax2005/rss-redistribution.git
-cd rss-redistribution
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+git clone https://github.com/OpenSAE/Redistribution-Sensitivity-Score.git
+cd Redistribution-Sensitivity-Score
+python -m pip install numpy
 ```
 
-`rss.py` 只依赖 NumPy，只用选择器时 `pip install numpy` 就够了。demo 另需 PyTorch、TransformerLens、SAE Lens 和 Matplotlib。下面的 demo 输出由 Python 3.12 和 [`requirements_demo.txt`](requirements_demo.txt) 里的版本得到，`pip install -r requirements_demo.txt` 会装上完全相同的版本。
-
-✅ **测试。** `python -m pytest` 检查论文依赖的性质，包括严格阈值、空支撑集记为不可用、Proposition 1 和 2、对尺度以及特征和变体顺序的不变性、输入检查，以及两份 README 快速上手的输出。每次 push 都由 GitHub Actions 自动运行。
-
----
-
-## 🚀 快速上手
+在同一 SAE 层、同一对齐 token 位置提取原始提示词（`clean`）、五个变体（`selection`）及独立留出变体（`heldout`）的特征激活：
 
 ```python
 import numpy as np
-from rss import rss
-
-# 5 个变体的 SAE 激活减去原始 prompt 的激活，每行一个变体，每列一个特征
-delta = np.array([[2.0, 0.0, -1.0,  0.3],
-                  [1.8, 0.0, -1.2, -0.3],
-                  [2.2, 0.5, -0.9,  0.3],
-                  [1.9, 0.0, -1.1, -0.3],
-                  [0.0, 0.0, -1.0,  0.3]])
-
-support, direction, mean_rss = rss(delta)   # rho = kappa = 0.8, tau = 1e-5, M = 400, K = 20
-print(support, direction, round(mean_rss, 2))
-# [0 2] [ 1 -1] 1.31
-```
-
-💡 特征 0 在 5 个变体中有 4 个上升，特征 2 在 5 个中全部下降，所以都保留。特征 3 每次都变，但方向来回翻，所以被去掉。
-
-👉 在 GPT-2 Small 上运行
-
-```bash
-python demo/demo.py
-```
-
-🧰 **用在自己的 SAE 上。** 为每个原始 prompt 写若干变体，保持请求不变，并让目标短语恰好出现一次。在与目标短语重叠的最后一个 token 处读取 SAE，做法同 [`demo/demo.py`](demo/demo.py) 里的 `sae_features`。在查看任何特征之前先把变体分成选择变体和留出变体，在前一组上选择，在后一组上检验选定方向。
-
-```python
 from rss import rss, held_out_rate
 
-# a0 的形状是 (n_features,)，a_sel 和 a_ho 的形状是 (n_variants, n_features)
-support, direction, mean_rss = rss(a_sel - a0)
-rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个值
+clean = np.zeros(4)
+selection = np.array([
+    [2.0, 0.0, -1.0,  0.3],
+    [1.8, 0.0, -1.2, -0.3],
+    [2.2, 0.5, -0.9,  0.3],
+    [1.9, 0.0, -1.1, -0.3],
+    [0.0, 0.0, -1.0,  0.3],
+])
+heldout = np.array([
+    [1.5, 0.0, -0.8, 0.1],
+    [2.0, 0.0, -1.2, 0.1],
+])
+support, direction, mean_rss = rss(selection - clean)
+rates = held_out_rate(heldout - clean, support, direction)
+print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
+# [0, 2] [1, -1] 1.31 [1.0, 1.0]
 ```
 
-留出验证和冻结读出评估见[更多 Demo](#更多-demo)。
+`rss` 返回选中的特征编号、主要变化方向和 MeanRSS。`held_out_rate` 在**未参与选择**的变体上测量方向保持比例。将示例数组换为自己模型的 SAE 激活即可，各变体数组形状为 `(variants, features)`。
+
+[核心 API 和输入规范](docs/CORE_API.md) · [模型演示程序](assets/demo/README.md)
 
 ---
 
@@ -341,52 +326,6 @@ rate = held_out_rate(a_ho - a0, support, direction)   # 每个选中特征一个
 RSS 重建留出 logit 变化的 $`R^2`$ 约为 0.58 和 0.63。把选中特征的读出输入恢复成干净值，可以纠正 72.2% 和 71.8% 的改写错误。这里紧凑的是每个样本用到的那组变化，而不是一个替代完整干净计算的缩小版探针。
 
 </details>
-
----
-
-## 🧪 Demo
-
-`demo/demo.py` 用 GPT-2 Small 和它的公开 SAE，在我们写的 24 个 prompt 上做 6 种改写，每种 5 个变体。它在每个变体都保留的那部分 prompt 的最后一个 token 处读取 SAE，对每个 prompt 和设置运行 `rss`，报告 MeanRSS、归一化值，以及上下文包装与局部改动之间的差。`python demo/demo.py` 默认用第 8 层，CPU 上约一分钟。用 `--layer` 可以选论文里 GPT-2 的另外三层 4、6、10。
-
-```text
-GPT-2 Small, layer 8, 24 prompts
-
-Transformation            MeanRSS  normalized
-Irrelevant context          2.121       1.107
-Distractor context          2.481       1.295
-Metalinguistic wrapper      1.977       1.032
-Format wrapper              2.341       1.222
-Punctuation noise           1.231       0.643
-Typed substitution          1.344       0.702
-
-Context and wrappers minus local edits: 0.492
-Prompts where context and wrappers move more: 24 / 24
-```
-
-<p align="center">
-  <img src="assets/demo_layer8.png" alt="Demo 输出" width="850"/>
-</p>
-
-✅ demo 和论文的规律一致。上下文和包装比局部改动让表示变化更大，同类词替换动到的是另一批特征。第 4、6、8、10 层的差分别为 0.903、0.717、0.492、0.390，24 个 prompt 中有 23 或 24 个方向一致。论文用 1,000 个生成的 prompt，这四层的差为 0.939 到 0.979。
-
-### 更多 Demo
-
-**留出验证。** 在 5 个 prompt 变体上选择 RSS 特征，再用 GPT-2 Small 检验其在另外 10 个变体上的方向一致性。
-
-```bash
-python demo/demo_heldout.py
-```
-
-[`rss_validation.py`](rss_validation.py) 提供评估函数，[`heldout_variants.py`](heldout_variants.py) 提供额外的测试 prompt。
-
-**冻结读出评估。** 使用固定的线性探针评估重复失败预测、logit 重构和读出恢复。
-
-```bash
-python demo/demo_readout.py --example
-python demo/demo_readout.py --data-dir /path/to/arrays
-```
-
-核心实现位于 [`rss_readout.py`](rss_readout.py)。运行 `python demo/demo_readout.py --example --export-example ./example_data` 可查看所需的 `.npy` 数据格式。
 
 ---
 

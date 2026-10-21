@@ -33,7 +33,7 @@ def counts(delta, tau):
 def test_readme_quickstart_runs_and_prints_what_it_says(readme):
     """The Quickstart block of each README is executed, and its output must match the comment under the print."""
     text = (Path(__file__).resolve().parents[1] / readme).read_text(encoding="utf8")
-    block = re.search(r"## 🚀 [^\n]+\s+```python\n(.*?)```", text, re.S).group(1)
+    block = re.search(r"## 🚀 [^\n]+[\s\S]*?```python\n(.*?)```", text, re.S).group(1)
     expected = re.search(r"^# (.+)$", block.strip().splitlines()[-1]).group(1)
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
