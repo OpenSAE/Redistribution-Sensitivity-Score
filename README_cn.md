@@ -5,9 +5,9 @@
 👉 一句话。即使底层请求保持不变，prompt 的改动仍会让激活在 SAE 特征之间重新分配。**重分配敏感度分数（RSS）** 找出在这些改动中变化大且方向一致的特征。
 
 <p align="center">
-  <b>📄 arXiv 论文即将上线</b> &nbsp; | &nbsp;
+  <a href="https://arxiv.org/abs/2610.21240"><b>📄 论文 (arXiv)</b></a> &nbsp; | &nbsp;
   <a href="https://opensae.github.io/Redistribution-Sensitivity-Score/"><b>🎞️ 5 分钟讲解</b></a> &nbsp; | &nbsp;
-  <a href="assets/demo/README.md"><b>🧪 Examples</b></a>
+  <a href="assets/demo/README.md"><b>🧪 示例</b></a>
 </p>
 
 ## 🎥 概览
@@ -35,9 +35,9 @@ same direction in at least four variants. MeanRSS averages their absolute respon
 
 - 🔁 **规律可复现。** 在全部 27 个 SAE 上，加上下文和套格式这两类改写都比局部改动让表示变化更大。归一化后两组相差 0.874，1,000 个 prompt 中每一个都是上下文和包装一组更大。
 - 🎯 **规则简单。** RSS 保留变化最大的特征，要求它在 5 个变体中至少 4 个有响应，并且至少 80% 的响应方向相同。
-- 🧭 **方向能保持。** 在留出变体上，RSS 特征沿选定方向响应的比例为 0.952，同样数量的随机特征为 0.758。
+- 🧭 **方向能保持。** 在 27 个 SAE 的评估中，RSS 特征在留出变体上沿选定方向响应的比例为 0.952，匹配数量的随机特征为 0.758。
 - 🧮 **变化不等于出错。** 对固定的线性读出，选中特征的贡献可以精确拆成读出权重、响应大小和与选定方向的一致程度。决策会不会翻转还取决于干净 margin。
-- 🛡️ **小而有用。** RSS 选特征时不看读出，但选出的 20 个和 19 个特征就能重建留出变体上的 logit 变化，$`R^2`$ 为 0.58 和 0.63，并保留完整读出的大部分失败排序能力。
+- 🛡️ **小而有用。** RSS 选特征时不看读出。两组模型的支持集大小中位数分别为 20 和 19，重建留出变体上 logit 变化的 $`R^2`$ 分别为 0.58 和 0.63，并保留完整读出的大部分失败排序能力。
 - ⚡ **代码很小。** 选择器就是一个 NumPy 函数 [`rss.py`](rss.py)。GPT-2 demo 在 CPU 上约一分钟跑完。
 
 ---
@@ -66,7 +66,7 @@ $`h_f`$ 对绝对值求平均，所以方向相反的变化不会互相抵消。
 
 $$r_f=\frac{n_f^{+}+n_f^{-}}{n},\qquad c_f=\frac{\max(n_f^{+},n_f^{-})}{n_f^{+}+n_f^{-}},\qquad s_f=\mathrm{sign}(n_f^{+}-n_f^{-}).$$
 
-$`r_f`$ 衡量反复出现的程度，$`c_f`$ 衡量方向一致性，$`s_f`$ 是主导方向。
+$`r_f`$ 衡量反复出现的程度，$`c_f`$ 衡量方向一致性，$`s_f`$ 是主导方向。当 $`n_f^{+}+n_f^{-}=0`$ 时，约定 $`c_f=0`$，该特征不参与选择。
 
 </details>
 
@@ -90,7 +90,11 @@ $$\mathrm{MeanRSS}=\frac{1}{\lvert S\rvert}\sum_{f\in S}h_f .$$
 
 为了比较尺度不同的 SAE，对每种设置 $`g`$ 先在 prompt $`i`$ 上平均 MeanRSS，再除以六种设置的平均
 
-$$R_g=\mathrm{mean}_i\,\mathrm{MeanRSS}_{i,g},\qquad \widetilde R_g=\frac{R_g}{\frac{1}{6}\sum_{g'}R_{g'}} .$$
+$$
+R_g = \frac{1}{N}\sum_{i=1}^{N}\mathrm{MeanRSS}_{i,g},
+\qquad
+\widetilde{R}_g = \frac{R_g}{\frac{1}{6}\sum_{g'=1}^{6}R_{g'}}.
+$$
 
 这样每个 SAE 的六个值平均为 1。对一个特征集合 $`A`$，$`H_g(A)`$ 是 $`\lvert\delta_{v,f}\rvert`$ 在 prompt、$`A`$ 中特征和留出变体上的平均，$`\widetilde H_g(A)`$ 是同样归一化后的值。记 $`\mathcal C`$ 为四种上下文和包装设置，$`\mathcal L`$ 为两种局部改动，留出对比为
 
@@ -266,6 +270,10 @@ print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig2.png" alt="Figure 2" width="900"/>
+</p>
+
 27 个 SAE 等权平均的归一化 MeanRSS $`\widetilde R_g`$。
 
 | 无关上下文 | 干扰上下文 | 元语言包装 | 格式包装 | 标点噪声 | 同类词替换 |
@@ -281,6 +289,10 @@ print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig3.png" alt="Figure 3" width="900"/>
+</p>
+
 在 27 个 SAE 中，RSS 区分上下文包装和局部改动的能力强于每一种对比方法的有 24 到 26 个，三者中最强的有 22 个。在留出变体上，RSS 支撑集沿选定方向响应的比例为 0.952，候选池和大小相同的随机支撑集为 0.758。
 
 </details>
@@ -289,6 +301,10 @@ print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
 <summary>🎯 Figure 4. Feature validation on held out variants</summary>
 
 <br>
+
+<p align="center">
+  <img src="assets/figures/fig4.png" alt="Figure 4" width="900"/>
+</p>
 
 | | Gemma 3 4B | Llama 3.1 8B |
 |---|:---:|:---:|
@@ -306,6 +322,10 @@ print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
 
 <br>
 
+<p align="center">
+  <img src="assets/figures/fig5.png" alt="Figure 5" width="900"/>
+</p>
+
 在每一种改写下，探针 AUROC 都保持在 0.90 以上，但仍有 4.2% 到 9.5% 的决策发生改变。在选择变体上估计的全部侵蚀与留出侵蚀的相关为 Gemma 0.923、Llama 0.896，RSS 支撑集的侵蚀为 0.737 和 0.793。只用干净 margin，反复出错的 AUROC 为 0.863 和 0.901。从干净 margin 中减去 RSS 支撑集的侵蚀，得到 0.935 和 0.958，完整剩余 margin 为 0.965 和 0.964。这些都是用已知类别标签做的离线排序。
 
 </details>
@@ -314,6 +334,10 @@ print(support.tolist(), direction.tolist(), round(mean_rss, 2), rates.tolist())
 <summary>🔬 Figure 6. Utility of RSS supports selected for each prompt and transformation within the frozen readout</summary>
 
 <br>
+
+<p align="center">
+  <img src="assets/figures/fig6.png" alt="Figure 6" width="900"/>
+</p>
 
 | | 完整读出 | RSS 支撑集 |
 |---|:---:|:---:|

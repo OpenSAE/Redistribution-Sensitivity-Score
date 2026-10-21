@@ -37,13 +37,14 @@ same direction in at least four variants. MeanRSS averages their absolute respon
   local edits. The normalized gap is 0.874, and the context and wrapper mean is larger for all 1,000 prompts.
 - 🎯 **A simple selection rule.** RSS keeps the largest feature changes that respond in at least four of five variants
   and point the same way in at least 80% of them.
-- 🧭 **Directions persist.** On held out variants, RSS features respond in their selected direction at a rate of 0.952,
-  compared with 0.758 for random features of the same number.
+- 🧭 **Directions persist.** Across the 27-SAE evaluation, selected features respond in their chosen direction on
+  held-out variants at a rate of 0.952, compared with 0.758 for matched random features.
 - 🧮 **Change is not failure.** For a fixed linear readout, the contribution of a selected feature splits exactly into
   its readout weight, its response size and its alignment with the selected direction. Whether a decision flips also
   depends on the clean margin.
-- 🛡️ **Compact and useful.** RSS features are chosen without the readout. Yet 20 and 19 of them reconstruct held out
-  logit changes with $`R^2`$ of 0.58 and 0.63 and keep most of the full readout's failure ranking.
+- 🛡️ **Compact and useful.** RSS features are chosen without the readout. With median support sizes of 20 and 19,
+  they reconstruct held-out logit changes with $`R^2`$ of 0.58 and 0.63 and retain most of the full readout's
+  failure-ranking performance.
 - ⚡ **Small code.** The selector is one NumPy function, [`rss.py`](rss.py). The GPT-2 demo runs in about a minute on a
   CPU.
 
@@ -76,7 +77,8 @@ those less than $`-\tau`$. Then
 
 $$r_f=\frac{n_f^{+}+n_f^{-}}{n},\qquad c_f=\frac{\max(n_f^{+},n_f^{-})}{n_f^{+}+n_f^{-}},\qquad s_f=\mathrm{sign}(n_f^{+}-n_f^{-}).$$
 
-Here $`r_f`$ measures recurrence, $`c_f`$ directional consistency and $`s_f`$ the dominant direction.
+Here $`r_f`$ measures recurrence, $`c_f`$ directional consistency and $`s_f`$ the dominant direction. When
+$`n_f^{+}+n_f^{-}=0`$, we set $`c_f=0`$ and exclude the feature from selection.
 
 </details>
 
@@ -104,11 +106,11 @@ in its dominant direction at least four times and in the opposite direction at m
 To compare SAEs of different scale, average MeanRSS over prompts $`i`$
 for each setting $`g`$ and divide by the mean of the six settings,
 
-$
+$$
 R_g = \frac{1}{N}\sum_{i=1}^{N}\mathrm{MeanRSS}_{i,g},
 \qquad
 \widetilde{R}_g = \frac{R_g}{\frac{1}{6}\sum_{g'=1}^{6}R_{g'}}.
-$
+$$
 
 The six values of each SAE then have mean one. For a feature set $`A`$, $`H_g(A)`$ averages $`\lvert\delta_{v,f}\rvert`$
 over prompts, features in $`A`$ and held out variants, and $`\widetilde H_g(A)`$ normalizes it in the same way. With
