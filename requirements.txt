@@ -3,3 +3,6 @@ matplotlib>=3.7
 torch>=2.1
 transformer-lens>=2.0
 sae-lens>=6.0
+transformers>=5.12.1,<6
+huggingface-hub>=1.21,<2
+safetensors>=0.8,<1

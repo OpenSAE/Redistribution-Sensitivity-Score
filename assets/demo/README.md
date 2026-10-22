@@ -5,7 +5,7 @@ The NumPy-only [`rss.py`](../../rss.py) selector is separate from model-specific
 Install the optional pretrained-model dependencies from the repository root:
 
 ```bash
-python -m pip install -r requirements_demo.txt
+python -m pip install -r requirements.txt
 ```
 
 Run the public GPT-2 Small experiments:
@@ -28,3 +28,7 @@ python assets/demo/demo_readout.py --data-dir /path/to/arrays
 `--example` is explicitly **synthetic**, not the paper's Gemma/Llama probes. Use `--example --export-example ./example_data` to inspect the required `.npy` files; real results require your own activation arrays and readout weights.
 
 For the public selector, refer to the single [Quickstart](../../README.md#-quickstart) or [core API guide](../../docs/CORE_API.md).
+
+## Recorded demo environment
+
+The bundled demo was generated with Python 3.12, using NumPy 2.5.0, Matplotlib 3.11.0, PyTorch 2.11.0, TransformerLens 3.5.0, SAE Lens 6.44.4, Transformers 5.12.1, huggingface-hub 1.21.0, and safetensors 0.8.0. These exact versions document the original run. The root `requirements.txt` uses minimum versions for broader compatibility.
